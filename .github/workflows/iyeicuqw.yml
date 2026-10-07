@@ -1,0 +1,59 @@
+name: Claude Code
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  claude:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    # Si ce job passe par un runner avec pare-feu egress, ajouter
+    # aws-external-anthropic.eu-west-1.api.aws a l'allow list.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+    env:
+      # Cle API de workspace generee dans la console AWS
+      # (Claude Platform on AWS -> API keys), pas une cle de console.anthropic.com
+      ANTHROPIC_AWS_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_AWS_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WS_ID }}
+      AWS_REGION: eu-west-1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@main
+        with:
+          # Placeholder pour passer la validation de l'action, neutralise dans settings.env
+          anthropic_api_key: "unused"
+          # Ce post-step appelle api.anthropic.com en direct avec ANTHROPIC_API_KEY
+          classify_inline_comments: "false"
+          settings: |
+            {
+              "env": {
+                "CLAUDE_CODE_USE_ANTHROPIC_AWS": "1",
+                "AWS_REGION": "eu-west-1",
+                "ANTHROPIC_API_KEY": ""
+              }
+            }
+          claude_args: |
+            --allowedTools "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
+            --model "claude-opus-4-7"
+            --permission-mode auto
