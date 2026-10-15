@@ -1,0 +1,23 @@
+name: test
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude:
+    # This job calls Claude, so it runs on GitHub's egress-firewall runner, which
+    # filters the job's outbound network traffic (allow list: .github/egress-firewall.yaml).
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Run 
+        run: |
+          npm install
+
