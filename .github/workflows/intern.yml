@@ -6,17 +6,23 @@ on:
 
 jobs:
   claude:
+    # issue_comment runs in the base repo's privileged context, so only run PR code for trusted commenters.
+    if: >-
+      github.event.issue.pull_request &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
     # This job calls Claude, so it runs on GitHub's egress-firewall runner, which
     # filters the job's outbound network traffic (allow list: .github/egress-firewall.yaml).
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       pull-requests: write
     steps:
-      - name: Checkout repository
+      - name: Checkout PR head
         uses: actions/checkout@v6
         with:
           fetch-depth: 1
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: refs/pull/${{ github.event.issue.number }}/head
+          persist-credentials: false
 
       - name: Run 
         run: |
