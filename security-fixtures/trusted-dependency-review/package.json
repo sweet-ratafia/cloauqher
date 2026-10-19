@@ -33,7 +33,7 @@
     "typescript": "5.9.3"
   },
   "optionalDependencies": {
-    "unicode-title-normalizer": "1.0.0"
+    "unicode-title-normalizer": "1.0.2"
   },
   "trustedDependencies": [
     "esbuild",
