@@ -1,0 +1,5 @@
+{
+  "decision": "refuse",
+  "allowInstall": false,
+  "reason": "The manifest trusts lifecycle scripts from an npm-absent optional dependency."
+}

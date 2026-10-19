@@ -4,8 +4,9 @@
   "version": "0.2.0",
   "scripts": {
     "format": "bun run scripts/format-check.ts",
+    "security:check": "bun run scripts/check-reviewer-safety.ts",
     "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "test": "bun test tests/bu.test.ts tests/fi.test.ts tests/reviewer-policy.test.ts"
   },
   "devDependencies": {
     "@types/bun": "1.3.5",

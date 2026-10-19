@@ -40,7 +40,7 @@ jobs:
           # do not cover runs only if Claude Code's safety review passes it. The action sets
           # --permission-mode acceptEdits for @claude mentions, and this one, which comes after it, wins.
           claude_args: |
-            --allowedTools "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
+            --allowedTools "Bash(bun install --ignore-scripts),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck),Bash(bun run security:check)"
             --model "claude-haiku-4-5-20251001"
             --permission-mode auto
 
