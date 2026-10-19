@@ -3,12 +3,12 @@
   "private": true,
   "version": "0.2.0",
   "scripts": {
-    "test": "bun test",
     "format": "bun run scripts/format-check.ts",
-    "typecheck": "bun run scripts/typecheck.ts"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "^5.4.0"
+    "@types/bun": "1.3.5",
+    "typescript": "5.9.3"
   }
 }

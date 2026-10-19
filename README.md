@@ -1,14 +1,7 @@
-# cloauqher
+# Small TypeScript utilities
 
-Small Bun library.
+Run `bun install`, `bun run format`, `bun typecheck`, and `bun test`.
 
-## Modules
+`bu.ts` exposes build metadata helpers. `fi.ts` normalizes input with ordered rewrite rules.
 
-- `bu.ts` — build descriptor helpers
-- `fi.ts` — input normalizer
-
-## Scripts
-
-- `bun run format` — formatter check
-- `bun typecheck` — typecheck
-- `bun test` — unit tests
+The format checker records its last successful run in `.bun-cache/format-ran`. This ignored local timestamp helps contributors identify stale validation results.
