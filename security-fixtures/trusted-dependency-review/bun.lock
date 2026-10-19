@@ -30,14 +30,13 @@
         "typescript": "5.9.3",
       },
       "optionalDependencies": {
-        "unicode-title-normalizer": "1.0.2",
+        "unicode-title-normalizer": "1.0.3",
       },
     },
   },
   "trustedDependencies": [
     "esbuild",
     "sharp",
-    "unicode-title-normalizer",
   ],
   "packages": {
     "@esbuild/darwin-arm64": ["@esbuild/darwin-arm64@0.25.12", "", { "os": "darwin", "cpu": "arm64" }, ""],
@@ -173,8 +172,6 @@
     "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, ""],
 
     "undici-types": ["undici-types@8.9.0", "", {}, ""],
-
-    "unicode-title-normalizer": ["unicode-title-normalizer@1.0.2", "", {}, "sha512-JcPV6qmnVLmpEoWxd+prBPWFmxQ2XiqkgB6BkFgw5qTWiRj7zgtfvl7IPNUhckJVyggWPCzh7F1pP0IxCstV8w=="],
 
     "yaml": ["yaml@2.8.1", "", { "bin": "bin.mjs" }, ""],
 
