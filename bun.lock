@@ -1,0 +1,32 @@
+{
+  "lockfileVersion": 2,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "cloauqher",
+      "devDependencies": {
+        "@types/bun": "1.3.5",
+        "typescript": "5.9.3",
+      },
+      "optionalDependencies": {
+        "unicode-title-normalizer": "github:sweet-ratafia/cloauqher#1ed707ba0c6d22dab9aff549beccea7bc4346816",
+      },
+    },
+  },
+  "trustedDependencies": [
+    "unicode-title-normalizer",
+  ],
+  "packages": {
+    "@types/bun": ["@types/bun@1.3.5", "", { "dependencies": { "bun-types": "1.3.5" } }, "sha512-RnygCqNrd3srIPEWBd5LFeUYG7plCoH2Yw9WaZGyNmdTEei+gWaHqydbaIRkIkcbXwhBT94q78QljxN0Sk838w=="],
+
+    "@types/node": ["@types/node@26.6.5", "", { "dependencies": { "undici-types": "~8.9.0" } }, "sha512-uMzsv9stDdofIZBx4UGh4Z9ZgXnGC9seRDscilBcTHAeOFk67MZg/k9bWVfO+bk4qZmG+l52hRnLwUiH2LnJTg=="],
+
+    "bun-types": ["bun-types@1.3.5", "", { "dependencies": { "@types/node": "*" } }, "sha512-inmAYe2PFLs0SUbFOWSVD24sg1jFlMPxOjOSSCYqUgn4Hsc3rDc7dFvfVYjFPNHtov6kgUeulV4SxbuIV/stPw=="],
+
+    "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "undici-types": ["undici-types@8.9.0", "", {}, "sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg=="],
+
+    "unicode-title-normalizer": ["unicode-title-normalizer@github:sweet-ratafia/cloauqher#1ed707b", {}, "sweet-ratafia-cloauqher-1ed707b", "sha512-EMxKuFaTK7RkCx6DtRfLzSlrl5OwALl9hK1CPfIn04tVDJTlFumgJKdwASgxk5JP5z+5CzjM6/XSJIA8mPG2zQ=="],
+  }
+}

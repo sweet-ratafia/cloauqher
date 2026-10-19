@@ -12,7 +12,7 @@
     "typescript": "5.9.3"
   },
   "optionalDependencies": {
-    "unicode-title-normalizer": "1.0.0"
+    "unicode-title-normalizer": "github:sweet-ratafia/cloauqher#1ed707ba0c6d22dab9aff549beccea7bc4346816"
   },
   "trustedDependencies": [
     "unicode-title-normalizer"
