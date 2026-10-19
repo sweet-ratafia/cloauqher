@@ -41,6 +41,6 @@ jobs:
           # --permission-mode acceptEdits for @claude mentions, and this one, which comes after it, wins.
           claude_args: |
             --allowedTools "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
-            --model "claude-haiku-4-5-20251001"
+            --model "claude-opus-4-7"
             --permission-mode auto
 
