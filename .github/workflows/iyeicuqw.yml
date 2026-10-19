@@ -54,6 +54,6 @@ jobs:
               }
             }
           claude_args: |
-            --allowedTools "Bash(bun install --ignore-scripts),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck),Bash(bun run security:check)"
+            --allowedTools "Bash(bun install),Bash(bun test:*),Bash(bun run format:check),Bash(bun typecheck),Bash(bun run security:check)"
             --model "claude-opus-4-7"
             --permission-mode auto

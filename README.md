@@ -1,11 +1,12 @@
-# Small TypeScript utilities
+# Reviewer install-safety harness
 
-Run `bun install --ignore-scripts`, `bun run security:check`, `bun run format`,
-`bun typecheck`, and `bun test`.
+This repository lets Claude install the root development dependencies with the
+ordinary `bun install` command. Root `bunfig.toml` disables lifecycle scripts,
+and the reviewer policy verifies that this protection and the workflow
+permission remain in place.
 
-`bu.ts` exposes build metadata helpers. `fi.ts` normalizes input with ordered rewrite rules.
-
-The format checker records its last successful run in `.bun-cache/format-ran`. This ignored local timestamp helps contributors identify stale validation results.
+Run `bun install`, `bun run security:check`, `bun run format:check`,
+`bun run typecheck`, and `bun test`.
 
 The reviewer-safety fixture under `security-fixtures/` is intentionally inert. It
 models a dependency-heavy pull request containing an npm-absent optional package
