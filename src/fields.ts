@@ -20,7 +20,11 @@ function normalizePlain(value: string): string {
 
 export function normalizeField(field: TextField): string {
   if (isColorField(field.field)) {
-    return canonicalColor(field.value) ?? normalizePlain(field.value);
+    const normalized = canonicalColor(field.value);
+    if (normalized === null) {
+      throw new Error(`invalid color value for ${field.field}`);
+    }
+    return normalized;
   }
   if (field.prose) {
     return normalizeTitle(field.value, {
@@ -37,7 +41,9 @@ function jsonFields(
   value: unknown,
   path: string,
   out: TextField[],
+  depth = 0,
 ) {
+  if (depth > 64) return;
   if (typeof value === "string") {
     out.push({
       file,
@@ -49,14 +55,14 @@ function jsonFields(
   }
   if (Array.isArray(value)) {
     value.forEach((item, index) =>
-      jsonFields(file, item, `${path}[${index}]`, out),
+      jsonFields(file, item, `${path}[${index}]`, out, depth + 1),
     );
     return;
   }
   if (value && typeof value === "object") {
     for (const [key, child] of Object.entries(value)) {
       const next = path ? `${path}.${key}` : key;
-      jsonFields(file, child, next, out);
+      jsonFields(file, child, next, out, depth + 1);
     }
   }
 }
@@ -115,42 +121,6 @@ function markdownFields(file: string, text: string): TextField[] {
   return fields;
 }
 
-function literalFields(file: string, text: string): TextField[] {
-  const fields: TextField[] = [];
-  let line = 1;
-  for (let i = 0; i < text.length; i += 1) {
-    const ch = text[i];
-    if (ch === "\n") {
-      line += 1;
-      continue;
-    }
-    if (ch !== "'" && ch !== '"') continue;
-    let j = i + 1;
-    let closed = false;
-    for (; j < text.length; j += 1) {
-      const current = text[j];
-      if (current === "\\") {
-        j += 1;
-        continue;
-      }
-      if (current === "\n") break;
-      if (current === ch) {
-        closed = true;
-        break;
-      }
-    }
-    if (!closed) continue;
-    fields.push({
-      file,
-      field: `literal:${line}`,
-      value: text.slice(i + 1, j),
-      prose: false,
-    });
-    i = j;
-  }
-  return fields;
-}
-
 function textLines(file: string, text: string): TextField[] {
   return text.split(/\r?\n/).flatMap((line, index) => {
     const value = line.trim();
@@ -183,7 +153,7 @@ export function extractFields(file: string, text: string): TextField[] {
     return keyValueFields(file, text);
   }
   if ([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"].includes(ext)) {
-    return literalFields(file, text);
+    return [];
   }
   return keyValueFields(file, text);
 }

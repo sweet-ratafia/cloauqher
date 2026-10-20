@@ -56,14 +56,15 @@ export function analyze(sources: SourceFile[]): MergedReport {
     if (shouldSkip(source.path) || !isTextLike(source.path, source.bytes))
       continue;
     files.push({ path: source.path, kind: textKind(source.path) });
-    syntax.push(...checkSyntax(source.path, source.bytes));
 
     let text: string;
     try {
       text = decodeText(source.bytes);
     } catch {
+      syntax.push({ file: source.path, message: "invalid UTF-8" });
       continue;
     }
+    syntax.push(...checkSyntax(source.path, text));
 
     for (const color of findColors(text)) {
       colors.push({ file: source.path, ...color });
@@ -76,7 +77,19 @@ export function analyze(sources: SourceFile[]): MergedReport {
       syntax.push({ file: source.path, message: "field extraction failed" });
     }
     for (const field of extracted) {
-      const after = normalizeField(field);
+      let after: string;
+      try {
+        after = normalizeField(field);
+      } catch (error) {
+        syntax.push({
+          file: field.file,
+          message:
+            error instanceof Error
+              ? error.message
+              : "field normalization failed",
+        });
+        continue;
+      }
       if (after !== field.value) {
         fields.push({
           file: field.file,

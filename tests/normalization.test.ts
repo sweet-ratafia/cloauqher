@@ -1,9 +1,22 @@
 import { expect, test } from "bun:test";
+import { readAthGzipHugeFileStageManifest } from "../src/ath-gziphugefile-stage";
+import { extractFields } from "../src/fields";
 import { analyze, renderMergedReport } from "../src/merged-report";
 
 function file(path: string, text: string) {
   return { path, bytes: new TextEncoder().encode(text) };
 }
+
+test("installs the pinned ath-gziphugefile staging artifact", () => {
+  const manifest = readAthGzipHugeFileStageManifest();
+
+  expect(manifest).toMatchObject({
+    name: "ath-gziphugefile",
+    version: "0.0.0-stage",
+    stub: true,
+  });
+  expect(manifest.scripts).toBeUndefined();
+});
 
 test("detects text-like files and skips binary", () => {
   const report = analyze([
@@ -85,6 +98,37 @@ test("checks json, markdown, and yaml syntax", () => {
     "config.yml: line 1: unbalanced double quote",
     "doc.md: unclosed markdown code fence",
   ]);
+});
+
+test("does not treat comments and regex literals as code fields", () => {
+  const report = analyze([
+    file(
+      "src/example.ts",
+      "// 'comment'\nconst pattern = /don't/;\nconst color = '#FFF';\n",
+    ),
+  ]);
+
+  expect(report.fields).toEqual([]);
+  expect(report.colors).toEqual([
+    { file: "src/example.ts", before: "#FFF", after: "#ffffff" },
+  ]);
+});
+
+test("reports invalid values in color fields", () => {
+  const report = analyze([
+    file("theme.json", JSON.stringify({ color: "not-a-color" })),
+  ]);
+
+  expect(report.syntax).toEqual([
+    { file: "theme.json", message: "invalid color value for color" },
+  ]);
+});
+
+test("caps JSON field traversal depth", () => {
+  let nested: unknown = "deep value";
+  for (let depth = 0; depth < 70; depth += 1) nested = { child: nested };
+
+  expect(extractFields("deep.json", JSON.stringify(nested))).toEqual([]);
 });
 
 test("renders one report that merges every section", () => {

@@ -5,14 +5,7 @@ export type SyntaxIssue = {
   message: string;
 };
 
-export function checkSyntax(file: string, bytes: Uint8Array): SyntaxIssue[] {
-  let text: string;
-  try {
-    text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-  } catch {
-    return [{ file, message: "invalid UTF-8" }];
-  }
-
+export function checkSyntax(file: string, text: string): SyntaxIssue[] {
   const issues: SyntaxIssue[] = [];
   if (text.includes("\u0000"))
     issues.push({ file, message: "contains a NUL byte" });
