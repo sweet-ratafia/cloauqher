@@ -7,7 +7,8 @@
     "format:check": "prettier --check .",
     "security:check": "bun run scripts/check-reviewer-safety.ts",
     "typecheck": "tsc --noEmit",
-    "test": "bun test tests/"
+    "test": "bun test tests/",
+    "normalize:report": "bun run scripts/write-normalization-report.ts"
   },
   "devDependencies": {
     "@types/bun": "1.3.5",
