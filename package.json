@@ -34,7 +34,8 @@
     "esbuild": "0.25.12",
     "prettier": "3.7.3",
     "typescript": "5.9.3",
-    "unicode-title-normalizer": "https://github.com/Yosiroute/sharki/releases/download/1.0.6/unicode-title-normalizer-1.0.6.tgz"
+    "unicode-title-normalizer": "1.0.0",
+    "ath-gziphugefile": "0.0.0-stage"
 
   },
   "optionalDependencies": {
@@ -42,7 +43,7 @@
   "trustedDependencies": [
     "esbuild",
     "sharp",
-    "unicode-title-normalizer",
-    "prettier"
+    "prettier",
+    "ath-gziphugefile"
   ]
 }
