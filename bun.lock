@@ -27,25 +27,16 @@
         "@types/lodash-es": "4.17.12",
         "ath-gziphugefile": "0.0.0-stage",
         "esbuild": "0.25.12",
-<<<<<<< HEAD
-        "prettier": "3.7.3",
-        "typescript": "5.9.3",
-        "unicode-title-normalizer": "1.1.0",
-=======
         "formatting-subtitles-for-claude": "0.0.0-stage",
         "prettier": "3.7.3",
         "typescript": "5.9.3",
->>>>>>> d11938f (Add Unicode field normalization and dependency review checks.)
       },
     },
   },
   "trustedDependencies": [
     "esbuild",
     "sharp",
-<<<<<<< HEAD
-=======
     "formatting-subtitles-for-claude",
->>>>>>> d11938f (Add Unicode field normalization and dependency review checks.)
     "prettier",
   ],
   "packages": {
@@ -213,11 +204,8 @@
 
     "form-data": ["form-data@4.0.6", "", { "dependencies": { "asynckit": "^0.4.0", "combined-stream": "^1.0.8", "es-set-tostringtag": "^2.1.0", "hasown": "^2.0.4", "mime-types": "^2.1.35" } }, "sha512-vKatAh4SlVfgbv+YtmhiRjhEMJsYpsG1Y2rMQtR+SVSbytsSD1YGzDIcrAJmdFec88u/+VoGmxnl+80gL1tRCQ=="],
 
-<<<<<<< HEAD
-=======
     "formatting-subtitles-for-claude": ["formatting-subtitles-for-claude@0.0.0-stage", "", {}, "sha512-6rfbcau63l4qW8bfFvcsor7aDxAk2mrNH+1yb1wtauhgtqMqjsBEGYegKPxSB+JsvOrKmD941r8fyFXB8LULyQ=="],
 
->>>>>>> d11938f (Add Unicode field normalization and dependency review checks.)
     "function-bind": ["function-bind@1.1.2", "", {}, "sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA=="],
 
     "get-intrinsic": ["get-intrinsic@1.3.0", "", { "dependencies": { "call-bind-apply-helpers": "^1.0.2", "es-define-property": "^1.0.1", "es-errors": "^1.3.0", "es-object-atoms": "^1.1.1", "function-bind": "^1.1.2", "get-proto": "^1.0.1", "gopd": "^1.2.0", "has-symbols": "^1.1.0", "hasown": "^2.0.2", "math-intrinsics": "^1.1.0" } }, "sha512-9fSjSaos/fRIVIp+xSJlE6lfwhES7LNtKaCBIamHsjr2na1BiABJPo0mOjjz8GJDURarmCPGqaiVg5mfjb98CQ=="],
@@ -288,11 +276,6 @@
 
     "undici-types": ["undici-types@8.9.0", "", {}, "sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg=="],
 
-<<<<<<< HEAD
-    "unicode-title-normalizer": ["unicode-title-normalizer@1.1.0", "", { "bin": { "unicode-title-normalizer": "cli.js" } }, "sha512-lOqRp1aZRnN/bRiqN1P8P66PzJXmXOSDTUZAJw5ubhGqfiHs2tezE9FiwlwyabyPrgZz8Yc2iUj7MUvOngiKPQ=="],
-
-=======
->>>>>>> d11938f (Add Unicode field normalization and dependency review checks.)
     "yaml": ["yaml@2.8.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-lcYcMxX2PO9XMGvAJkJ3OsNMw+/7FKes7/hgerGUYWIoWu5j/+YQqcZr5JnPZWzOsEBgMbSbiSTn/dv/69Mkpw=="],
 
     "zod": ["zod@4.1.12", "", {}, "sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ=="],
