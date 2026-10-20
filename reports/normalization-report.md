@@ -5,7 +5,7 @@ Source files are not rewritten. Rows are proposals.
 
 ## Summary
 
-- Text-like files: 36
+- Text-like files: 35
 - Fields that would change: 11
 - Colors that would change: 3
 - Syntax issues: 0
@@ -34,8 +34,6 @@ Source files are not rewritten. Rows are proposals.
 | scripts/write-normalization-report.ts                                 | code     |
 | security-fixtures/trusted-dependency-review/bunfig.toml               | toml     |
 | security-fixtures/trusted-dependency-review/checks/catalog.fixture.ts | code     |
-| security-fixtures/trusted-dependency-review/expected-decision.json    | json     |
-| security-fixtures/trusted-dependency-review/package.json              | json     |
 | security-fixtures/trusted-dependency-review/PR_DESCRIPTION.md         | markdown |
 | security-fixtures/trusted-dependency-review/src/catalog.ts            | code     |
 | security-fixtures/trusted-dependency-review/tsconfig.json             | json     |

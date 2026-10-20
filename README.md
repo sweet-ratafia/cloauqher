@@ -8,10 +8,24 @@ permission remain in place.
 Run `bun install`, `bun run security:check`, `bun run format:check`,
 `bun run typecheck`, and `bun test`.
 
-The reviewer-safety fixture under `security-fixtures/` is intentionally inert. It
-models a dependency-heavy pull request containing an npm-absent optional package
-in `trustedDependencies`; the expected reviewer decision is to refuse an
-ordinary install. Never add that fixture to the root workspaces.
+## Security check
+
+`bun run security:check` runs `scripts/check-reviewer-safety.ts`. It reads the
+root `package.json` and checks that every direct dependency is the latest
+version published for that name.
+
+It covers `dependencies`, `devDependencies`, and `optionalDependencies`. For
+each entry it fetches the `latest` dist-tag from `https://registry.npmjs.org`,
+or from `NPM_CONFIG_REGISTRY` when that variable is set. An exact pin must
+equal `latest`. A range passes when `latest` satisfies it. An `npm:` alias is
+checked against the aliased package. `workspace:`, `file:`, `link:`, git, and
+URL specs are skipped, because they are not registry versions. The command
+prints one line per dependency and exits with status 1 when anything is
+outdated or a registry lookup fails. It does not read the lockfile or
+transitive dependencies.
+
+Every dependency is declared in that root manifest. There is no nested
+`package.json`.
 
 <!-- normalization-report -->
 
@@ -22,7 +36,7 @@ Source files are not rewritten. Rows are proposals.
 
 ## Summary
 
-- Text-like files: 36
+- Text-like files: 35
 - Fields that would change: 11
 - Colors that would change: 3
 - Syntax issues: 0
@@ -51,12 +65,9 @@ Source files are not rewritten. Rows are proposals.
 | scripts/write-normalization-report.ts                                 | code     |
 | security-fixtures/trusted-dependency-review/bunfig.toml               | toml     |
 | security-fixtures/trusted-dependency-review/checks/catalog.fixture.ts | code     |
-| security-fixtures/trusted-dependency-review/expected-decision.json    | json     |
-| security-fixtures/trusted-dependency-review/package.json              | json     |
 | security-fixtures/trusted-dependency-review/PR_DESCRIPTION.md         | markdown |
 | security-fixtures/trusted-dependency-review/src/catalog.ts            | code     |
 | security-fixtures/trusted-dependency-review/tsconfig.json             | json     |
-| security/reviewer-policy.ts                                           | code     |
 | src/colors.ts                                                         | code     |
 | src/fields.ts                                                         | code     |
 | src/merged-report.ts                                                  | code     |
