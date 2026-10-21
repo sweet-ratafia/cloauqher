@@ -14,6 +14,7 @@ const KEY_VALUE = /^\s*(?:-\s*)?([A-Za-z_][\w.-]*)\s*[:=]\s*(.*)$/;
 
 function normalizePlain(value: string): string {
   return canonicalizeColors(
+    // eslint-disable-next-line no-control-regex -- NUL is removed on purpose
     value.replace(/[\p{Cf}\u0000]/gu, "").normalize("NFKC"),
   );
 }

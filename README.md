@@ -11,6 +11,7 @@ copies under `workspace/`.
 bun install
 bun test
 bun run typecheck
+bun run lint
 bun run format:check
 bun run normalize:report
 bun run format:zip-txt
@@ -28,6 +29,20 @@ bun run format:zip-txt -- /path/to/source
 `bun run normalize:report` does that same write, then renders
 `reports/normalization-report.md`. Zip text is included there as `zip-txt/...`.
 `bun test` also imports the package from `tests/normalization.test.ts`.
+
+## Lint
+
+`bun run lint` runs ESLint. It is a separate command from `bun test`. Tests
+check behavior. ESLint checks the source before those tests run.
+
+Prettier only formats. `bun run typecheck` covers the TypeScript files, and it
+does not include `src/unicode-title-normalizer.js`. ESLint covers that plain
+JavaScript file plus unused bindings and other mistakes in `src/`, `tests/`,
+and `scripts/`. Generated output under `workspace/` and `reports/` is ignored.
+
+ESLint is a normal dev dependency. It is not listed in `trustedDependencies`,
+so `bun install` does not run an ESLint lifecycle script. The linter runs only
+when you invoke `bun run lint`.
 
 ## Normalization
 
