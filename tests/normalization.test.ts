@@ -1,21 +1,113 @@
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join, relative } from "node:path";
+import {
+  analyseZipThenRezipTxt,
+  packZip,
+} from "analyse-zip-then-rezip-txt";
 import { expect, test } from "bun:test";
-import { readAthGzipHugeFileStageManifest } from "../src/ath-gziphugefile-stage";
 import { extractFields } from "../src/fields";
 import { analyze, renderMergedReport } from "../src/merged-report";
+import {
+  findZipFiles,
+  formatZipTxtWorkspace,
+} from "../src/zip-txt-workspace";
 
 function file(path: string, text: string) {
   return { path, bytes: new TextEncoder().encode(text) };
 }
 
-test("installs the pinned ath-gziphugefile staging artifact", () => {
-  const manifest = readAthGzipHugeFileStageManifest();
+test("formats zip txt entries into a workspace", () => {
+  const original = "cafe\u0301 menu #FFF\n";
+  const zip = packZip([
+    { name: "notes/readme.md", data: "# keep me out\n" },
+    { name: "notes/menu.txt", data: original },
+    { name: "notes/plain.txt", data: "Already Fine\n" },
+    { name: "../secret.txt", data: "hidden\n" },
+  ]);
 
-  expect(manifest).toMatchObject({
-    name: "ath-gziphugefile",
-    version: "0.0.0-stage",
-    stub: true,
-  });
-  expect(manifest.scripts).toBeUndefined();
+  const analysed = analyseZipThenRezipTxt(zip);
+  expect(analysed.entries.map((entry) => entry.name)).toEqual([
+    "notes/readme.md",
+    "notes/menu.txt",
+    "notes/plain.txt",
+    "../secret.txt",
+  ]);
+  const rebuilt = analyseZipThenRezipTxt(analysed.zip);
+  expect(rebuilt.entries.map((entry) => [entry.name, entry.text])).toEqual([
+    ["notes/menu.txt", original],
+    ["notes/plain.txt", "Already Fine\n"],
+    ["../secret.txt", "hidden\n"],
+  ]);
+
+  const dir = mkdtempSync(join(tmpdir(), "zip-txt-"));
+  try {
+    const workspaceDir = join(dir, "workspace");
+    mkdirSync(join(workspaceDir, "bundle"), { recursive: true });
+    writeFileSync(join(workspaceDir, "bundle", "stale.txt"), "old\n");
+    const result = formatZipTxtWorkspace({
+      workspaceDir,
+      archives: [{ name: "bundle.zip", bytes: zip }],
+    });
+
+    expect(result.files.map((file) => file.workspaceFile)).toEqual([
+      "bundle/notes/menu.txt",
+      "bundle/notes/plain.txt",
+    ]);
+    expect(result.skipped).toEqual([
+      {
+        archive: "bundle.zip",
+        entry: "../secret.txt",
+        reason: "unsafe zip path",
+      },
+    ]);
+    expect(readFileSync(result.files[0].outputPath, "utf8")).toBe(
+      "Café Menu #ffffff\n",
+    );
+    expect(result.files[0].changed).toBe(true);
+    expect(readFileSync(result.files[1].outputPath, "utf8")).toBe(
+      "Already Fine\n",
+    );
+    expect(result.files[1].changed).toBe(false);
+    expect(existsSync(join(workspaceDir, "bundle", "stale.txt"))).toBe(false);
+    expect(readFileSync(join(workspaceDir, "zip-txt.md"), "utf8")).toContain(
+      "unsafe zip path",
+    );
+    expect(analyze([file("notes/menu.txt", original)]).fields).toEqual([
+      {
+        file: "notes/menu.txt",
+        field: "line:1",
+        before: "cafe\u0301 menu #FFF",
+        after: "Café Menu #ffffff",
+      },
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("finds zip files outside skipped directories", () => {
+  const dir = mkdtempSync(join(tmpdir(), "zip-find-"));
+  const zip = packZip([{ name: "a.txt", data: "Hi\n" }]);
+  try {
+    mkdirSync(join(dir, "node_modules"));
+    mkdirSync(join(dir, "workspace"));
+    writeFileSync(join(dir, "notes.zip"), zip);
+    writeFileSync(join(dir, "node_modules", "skip.zip"), zip);
+    writeFileSync(join(dir, "workspace", "out.zip"), zip);
+    expect(findZipFiles(dir).map((found) => relative(dir, found))).toEqual([
+      "notes.zip",
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test("detects text-like files and skips binary", () => {

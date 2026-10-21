@@ -13,6 +13,10 @@ import {
   type SourceFile,
 } from "../src/merged-report";
 import { shouldSkip } from "../src/text-files";
+import {
+  formatZipTxtWorkspace,
+  loadZipArchives,
+} from "../src/zip-txt-workspace";
 
 function walk(dir: string, root: string, out: SourceFile[]) {
   for (const entry of readdirSync(dir)) {
@@ -35,6 +39,16 @@ function walk(dir: string, root: string, out: SourceFile[]) {
 const root = process.cwd();
 const sources: SourceFile[] = [];
 walk(root, root, sources);
+const zipTxt = formatZipTxtWorkspace({
+  workspaceDir: join(root, "workspace"),
+  archives: loadZipArchives(root),
+});
+for (const file of zipTxt.files) {
+  sources.push({
+    path: file.reportPath,
+    bytes: Buffer.from(file.before, "utf8"),
+  });
+}
 const report = await format(renderMergedReport(analyze(sources)), {
   parser: "markdown",
 });
