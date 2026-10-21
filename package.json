@@ -2,19 +2,22 @@
   "name": "cloauqher",
   "private": true,
   "version": "0.2.0",
+  "packageManager": "bun@1.3.14",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "security:check": "bun run scripts/check-reviewer-safety.ts",
     "typecheck": "tsc --noEmit",
-    "test": "bun test tests/",
+    "test": "bun test tests/ packages/analyse-zip-then-rezip-txt/test/",
     "complete-test-formatting": "bun run scripts/complete-test-formatting.ts",
     "normalize:report": "bun run scripts/write-normalization-report.ts",
     "format:zip-txt": "bun run scripts/format-zip-txt.ts"
   },
   "dependencies": {
-    "analyse-zip-then-rezip-txt": "file:../analyse-zip-then-rezip-txt",
+    "analyse-zip-then-rezip-txt": "workspace:*",
     "axios": "1.13.2",
     "chalk": "5.6.2",
     "commander": "14.0.2",
@@ -40,10 +43,10 @@
     "eslint": "10.13.0",
     "prettier": "3.7.3",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.72.0"  },
+    "typescript-eslint": "8.72.0"
+  },
   "trustedDependencies": [
     "esbuild",
-    "sharp",
-    "prettier"
-    ]
+    "sharp"
+  ]
 }

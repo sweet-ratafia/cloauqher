@@ -9,7 +9,13 @@ export type TextField = {
   prose: boolean;
 };
 
-const PROSE_KEY = /(title|description|summary|heading|label)$/i;
+const PROSE_KEYS = new Set([
+  "title",
+  "description",
+  "summary",
+  "heading",
+  "label",
+]);
 const KEY_VALUE = /^\s*(?:-\s*)?([A-Za-z_][\w.-]*)\s*[:=]\s*(.*)$/;
 
 function normalizePlain(value: string): string {
@@ -17,6 +23,40 @@ function normalizePlain(value: string): string {
     // eslint-disable-next-line no-control-regex -- NUL is removed on purpose
     value.replace(/[\p{Cf}\u0000]/gu, "").normalize("NFKC"),
   );
+}
+
+function finalKey(path: string): string {
+  return (
+    path
+      .replace(/:\d+$/, "")
+      .split(/[.[]/)
+      .at(-1)
+      ?.replace(/\]$/, "")
+      .toLowerCase() ?? ""
+  );
+}
+
+function isProseField(path: string): boolean {
+  return PROSE_KEYS.has(finalKey(path));
+}
+
+function stripTrailingComment(value: string): string {
+  let quote: "'" | '"' | null = null;
+  let escaped = false;
+  for (let index = 0; index < value.length; index += 1) {
+    const char = value[index];
+    if (quote === '"' && char === "\\" && !escaped) {
+      escaped = true;
+      continue;
+    }
+    if ((char === '"' || char === "'") && !escaped) {
+      quote = quote === char ? null : (quote ?? char);
+    } else if (char === "#" && quote === null) {
+      return value.slice(0, index).trimEnd();
+    }
+    escaped = false;
+  }
+  return value;
 }
 
 export function normalizeField(field: TextField): string {
@@ -50,7 +90,7 @@ function jsonFields(
       file,
       field: path || "$",
       value,
-      prose: PROSE_KEY.test(path),
+      prose: isProseField(path),
     });
     return;
   }
@@ -86,13 +126,13 @@ function keyValueFields(file: string, text: string): TextField[] {
     const match = KEY_VALUE.exec(line);
     if (!match) return;
     const key = match[1] ?? "";
-    const raw = (match[2] ?? "").trim();
+    const raw = stripTrailingComment((match[2] ?? "").trim());
     if (!raw || raw === "|" || raw === ">") return;
     fields.push({
       file,
       field: `${key}:${index + 1}`,
       value: stripQuotes(raw),
-      prose: PROSE_KEY.test(key),
+      prose: isProseField(key),
     });
   });
   return fields;
@@ -100,24 +140,22 @@ function keyValueFields(file: string, text: string): TextField[] {
 
 function markdownFields(file: string, text: string): TextField[] {
   const fields: TextField[] = [];
-  const chunks = text.split(/^```.*$/m);
-  chunks.forEach((chunk, index) => {
-    if (index % 2 === 1) return;
-    const lines = chunk.split(/\r?\n/);
-    let offset = 0;
-    for (let i = 0; i < index; i += 1) {
-      offset += chunks[i]?.split(/\r?\n/).length ?? 0;
+  let inFence = false;
+  text.split(/\r?\n/).forEach((line, lineIndex) => {
+    if (/^\s*```/.test(line)) {
+      inFence = !inFence;
+      return;
     }
-    lines.forEach((line, lineIndex) => {
+    if (!inFence) {
       const heading = /^(#{1,6})\s+(.+?)\s*$/.exec(line);
       if (!heading) return;
       fields.push({
         file,
-        field: `heading:${offset + lineIndex + 1}`,
+        field: `heading:${lineIndex + 1}`,
         value: heading[2] ?? "",
         prose: true,
       });
-    });
+    }
   });
   return fields;
 }

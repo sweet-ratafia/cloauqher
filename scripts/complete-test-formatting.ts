@@ -4,7 +4,8 @@
  * Usage (from the repo root):
  *   bun run complete-test-formatting
  *
- * Runs `bun install`, then `bun test tests/`, then validates the test
+ * Runs `bun install`, then the application and workspace tests, then validates
+ * the test
  * summary: a zero exit status, a parsed pass count, and zero failures.
  */
 import { spawnSync } from "node:child_process";
@@ -31,9 +32,13 @@ function run(args: string[]): StepResult {
   return { status: result.status, output };
 }
 
-function parseTestSummary(output: string): { pass: number; fail: number } | null {
-  const pass = output.match(/^\s*(\d+)\s+pass\b/m);
-  const fail = output.match(/^\s*(\d+)\s+fail\b/m);
+function parseTestSummary(
+  output: string,
+): { pass: number; fail: number } | null {
+  // eslint-disable-next-line no-control-regex -- strips terminal color escapes
+  const plain = output.replace(/\u001b\[[0-9;]*m/g, "");
+  const pass = plain.match(/^\s*(\d+)\s+pass\b/m);
+  const fail = plain.match(/^\s*(\d+)\s+fail\b/m);
   if (!pass || !fail) return null;
   return { pass: Number(pass[1]), fail: Number(fail[1]) };
 }
@@ -44,7 +49,11 @@ if (install.status !== 0) {
   process.exit(install.status ?? 1);
 }
 
-const tests = run(["test", "tests/"]);
+const tests = run([
+  "test",
+  "tests/",
+  "packages/analyse-zip-then-rezip-txt/test/",
+]);
 const summary = parseTestSummary(tests.output);
 const valid =
   tests.status === 0 &&

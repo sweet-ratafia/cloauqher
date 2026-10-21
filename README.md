@@ -26,9 +26,10 @@ root:
 bun run format:zip-txt -- /path/to/source
 ```
 
-`bun run normalize:report` does that same write, then renders
-`reports/normalization-report.md`. Zip text is included there as `zip-txt/...`.
-`bun test` also imports the package from `tests/normalization.test.ts`.
+`bun run normalize:report` analyzes the same archive entries without rewriting
+`workspace/`, then renders `reports/normalization-report.md`. Zip text is
+included there as `zip-txt/...`. `bun test` covers both the application and
+the workspace package.
 
 ## Lint
 
@@ -59,9 +60,13 @@ syntax check.
 
 ## Zip text
 
-`analyse-zip-then-rezip-txt` is the module that will be published on npm. Until
-then it is linked with `file:../analyse-zip-then-rezip-txt`. Code imports it by
-that package name.
+`analyse-zip-then-rezip-txt` lives under `packages/` as a Bun workspace.
+Fresh clones therefore install and test the same code without requiring a
+sibling checkout. Application code imports it by its package name.
+
+`workspace/` and `reports/` are checked-in, deterministic examples. Regenerate
+them with `bun run format:zip-txt` and `bun run normalize:report` when behavior
+changes.
 
 `fixtures/sample-notes.zip` is the checked-in sample. The formatter writes:
 
@@ -76,17 +81,18 @@ so entries removed from the zip do not linger.
 
 ## Layout
 
-| Path | Role |
-| --- | --- |
-| `src/merged-report.ts` | Runs detection, normalization, colors, and syntax, then renders the report |
-| `src/fields.ts` | Extracts fields and normalizes them |
-| `src/colors.ts` | Canonicalizes color tokens |
-| `src/text-files.ts` | Decides which files are text and which paths are skipped |
-| `src/syntax-check.ts` | Checks JSON, Markdown, YAML, and TOML |
-| `src/zip-txt-workspace.ts` | Finds zips and writes `workspace/` |
-| `src/unicode-title-normalizer.js` | Unicode, title case, and color implementation |
-| `scripts/format-zip-txt.ts` | CLI for `bun run format:zip-txt` |
-| `scripts/write-normalization-report.ts` | CLI for `bun run normalize:report` |
-| `fixtures/sample-notes.zip` | Sample archive, including an unsafe path |
-| `workspace/` | Generated `.txt` copies and `zip-txt.md` |
-| `reports/normalization-report.md` | Generated combined report |
+| Path                                    | Role                                                                       |
+| --------------------------------------- | -------------------------------------------------------------------------- |
+| `src/merged-report.ts`                  | Runs detection, normalization, colors, and syntax, then renders the report |
+| `src/fields.ts`                         | Extracts fields and normalizes them                                        |
+| `src/colors.ts`                         | Canonicalizes color tokens                                                 |
+| `src/text-files.ts`                     | Decides which files are text and which paths are skipped                   |
+| `src/syntax-check.ts`                   | Checks JSON, Markdown, YAML, and TOML                                      |
+| `src/zip-txt-workspace.ts`              | Finds zips and writes `workspace/`                                         |
+| `src/unicode-title-normalizer.js`       | Unicode, title case, and color implementation                              |
+| `packages/analyse-zip-then-rezip-txt/`  | Workspace package that safely reads and rebuilds ZIP text entries          |
+| `scripts/format-zip-txt.ts`             | CLI for `bun run format:zip-txt`                                           |
+| `scripts/write-normalization-report.ts` | CLI for `bun run normalize:report`                                         |
+| `fixtures/sample-notes.zip`             | Sample archive, including an unsafe path                                   |
+| `workspace/`                            | Generated `.txt` copies and `zip-txt.md`                                   |
+| `reports/normalization-report.md`       | Generated combined report                                                  |

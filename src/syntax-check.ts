@@ -5,6 +5,25 @@ export type SyntaxIssue = {
   message: string;
 };
 
+function stripTrailingComment(line: string): string {
+  let quote: "'" | '"' | null = null;
+  let escaped = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    if (quote === '"' && char === "\\" && !escaped) {
+      escaped = true;
+      continue;
+    }
+    if ((char === '"' || char === "'") && !escaped) {
+      quote = quote === char ? null : (quote ?? char);
+    } else if (char === "#" && quote === null) {
+      return line.slice(0, index);
+    }
+    escaped = false;
+  }
+  return line;
+}
+
 export function checkSyntax(file: string, text: string): SyntaxIssue[] {
   const issues: SyntaxIssue[] = [];
   if (text.includes("\u0000"))
@@ -36,7 +55,7 @@ export function checkSyntax(file: string, text: string): SyntaxIssue[] {
       if (/^\t/.test(line)) {
         issues.push({ file, message: `line ${index + 1}: tab indentation` });
       }
-      const code = line.replace(/(^|[^\\])#.*/, "$1");
+      const code = stripTrailingComment(line);
       const quotes = code.match(/(?<!\\)"/g);
       if ((quotes?.length ?? 0) % 2 === 1) {
         issues.push({

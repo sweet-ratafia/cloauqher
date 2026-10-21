@@ -376,7 +376,7 @@ function titleCase(input) {
     .map((part) => {
       if (/^\s+$/u.test(part)) return part;
       return part
-        .split(/([-/'’])/u)
+        .split(/([-/])/u)
         .map((segment, index) => {
           if (index % 2 === 1 || segment.length === 0) return segment;
           const chars = [...segment];
@@ -413,7 +413,7 @@ function resolveOptions(options) {
  * - apply Unicode normalization (NFKC by default)
  * - collapse whitespace
  * - canonicalize embedded #hex / rgb() / hsl() colors
- * - title-case letters, including after hyphens and apostrophes
+ * - title-case letters, including after hyphens and slashes
  */
 function normalizeTitle(input, options) {
   const value = asString(input, "title");
