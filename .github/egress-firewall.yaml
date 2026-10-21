@@ -1,0 +1,15 @@
+# Hosts required by the Claude review workflow. The firewall runner blocks all
+# other outbound traffic except destinations GitHub permits by default.
+mode: enforce
+allow:
+  # GitHub API calls made by the Claude Code action.
+  - api.github.com
+  # Claude Platform on AWS model and token exchange endpoint.
+  - aws-external-anthropic.eu-west-1.api.aws
+  # Claude Code installer and binary downloads used by the action.
+  - claude.ai
+  - downloads.claude.ai
+  # Bun binary downloaded by the action's setup step.
+  - release-assets.githubusercontent.com
+  # Packages needed by the Claude Code action and reviewed repository.
+  - registry.npmjs.org

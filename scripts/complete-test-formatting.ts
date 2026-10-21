@@ -4,8 +4,8 @@
  * Usage (from the repo root):
  *   bun run complete-test-formatting
  *
- * Runs `bun install`, then the application and workspace tests, then validates
- * the test
+ * Runs `bun install --frozen-lockfile`, then the application and workspace
+ * tests, then validates the test
  * summary: a zero exit status, a parsed pass count, and zero failures.
  */
 import { spawnSync } from "node:child_process";
@@ -43,9 +43,9 @@ function parseTestSummary(
   return { pass: Number(pass[1]), fail: Number(fail[1]) };
 }
 
-const install = run(["install"]);
+const install = run(["install", "--frozen-lockfile"]);
 if (install.status !== 0) {
-  console.error("\ncomplete-test-formatting: bun install failed");
+  console.error("\ncomplete-test-formatting: frozen bun install failed");
   process.exit(install.status ?? 1);
 }
 

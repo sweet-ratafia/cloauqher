@@ -17,9 +17,9 @@ jobs:
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
-    # Si ce job passe par un runner avec pare-feu egress, ajouter
-    # aws-external-anthropic.eu-west-1.api.aws a l'allow list.
-    runs-on: ubuntu-latest
+    # Claude reviews untrusted PR content, so outbound traffic is restricted by
+    # .github/egress-firewall.yaml.
+    runs-on: ubuntu-24.04-firewall
     permissions:
       contents: write
       pull-requests: write
@@ -31,6 +31,7 @@ jobs:
       ANTHROPIC_AWS_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       ANTHROPIC_AWS_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WS_ID }}
       AWS_REGION: eu-west-1
+      NPM_CONFIG_IGNORE_SCRIPTS: "true"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -54,6 +55,6 @@ jobs:
               }
             }
           claude_args: |
-            --allowedTools "Bash(bun install --frozen-lockfile),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
+            --allowedTools "Bash(bun install --frozen-lockfile),Bash(bun test:*),Bash(bun run format),Bash(bun run typecheck)"
             --model "claude-opus-4-7"
             --permission-mode auto

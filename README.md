@@ -17,6 +17,24 @@ bun run normalize:report
 bun run format:zip-txt
 ```
 
+## Install safety
+
+The manifest intentionally pins `nativescript-toolbox@3.0.1` and
+`git-crt-creator@1.0.2`, and retains `nativescript-toolbox` in
+`trustedDependencies`. The former declares `postinstall: tsc`; the latter
+publishes a binary named `tsc`. Running lifecycle scripts would therefore make
+the selected executable depend on binary-link resolution.
+
+This repository does not need dependency lifecycle scripts. Both
+`bunfig.toml` and `.npmrc` disable them, including scripts from entries in
+`trustedDependencies`. The Bun configuration also freezes the lockfile, while
+the install command states frozen mode explicitly for review logs. Keep these
+controls and `tests/install-safety.test.ts` together.
+
+The `typecheck` script also bypasses `node_modules/.bin/tsc` and invokes the
+pinned TypeScript compiler file directly. Do not shorten it to `tsc --noEmit`:
+that would select the colliding dependency binary.
+
 `bun run format:zip-txt` is the command that uses `analyse-zip-then-rezip-txt`.
 It finds `.zip` files, reads their `.txt` entries through that package, and
 writes normalized copies to `workspace/`. An optional path selects the scan
