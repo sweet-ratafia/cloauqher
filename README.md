@@ -8,7 +8,7 @@ copies under `workspace/`.
 ## Commands
 
 ```bash
-bun install
+bun install --frozen-lockfile
 bun test
 bun run typecheck
 bun run lint
@@ -42,8 +42,8 @@ JavaScript file plus unused bindings and other mistakes in `src/`, `tests/`,
 and `scripts/`. Generated output under `workspace/` and `reports/` is ignored.
 
 ESLint is a normal dev dependency. It is not listed in `trustedDependencies`,
-so `bun install` does not run an ESLint lifecycle script. The linter runs only
-when you invoke `bun run lint`.
+so the frozen install does not run an ESLint lifecycle script. The linter runs
+only when you invoke `bun run lint`.
 
 ## Normalization
 
