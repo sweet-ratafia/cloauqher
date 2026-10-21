@@ -28,6 +28,8 @@ const TEXT_BASENAMES = new Set([
 
 const SKIP_DIRS = new Set([
   ".git",
+  ".github",
+  ".claude",
   "node_modules",
   ".bun-cache",
   "reports",

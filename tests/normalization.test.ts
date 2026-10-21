@@ -8,17 +8,11 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
-import {
-  analyseZipThenRezipTxt,
-  packZip,
-} from "analyse-zip-then-rezip-txt";
+import { analyseZipThenRezipTxt, packZip } from "analyse-zip-then-rezip-txt";
 import { expect, test } from "bun:test";
 import { extractFields } from "../src/fields";
 import { analyze, renderMergedReport } from "../src/merged-report";
-import {
-  findZipFiles,
-  formatZipTxtWorkspace,
-} from "../src/zip-txt-workspace";
+import { findZipFiles, formatZipTxtWorkspace } from "../src/zip-txt-workspace";
 
 function file(path: string, text: string) {
   return { path, bytes: new TextEncoder().encode(text) };
@@ -174,6 +168,77 @@ test("normalizes unicode fields, titles, and colors", () => {
     ]),
   );
   expect(report.colors.some((color) => color.before === "#123")).toBe(false);
+});
+
+test("handles contractions, exact field names, comments, and markdown fences", () => {
+  const report = analyze([
+    file("notes.txt", "it's don't\n"),
+    file(
+      "settings.yml",
+      'name: "hello #world"\nlabel: release notes # keep this comment\n',
+    ),
+    file("docs.md", "# Before\n```ts\n# not a heading\n```\n## After\n"),
+    file(
+      "config.json",
+      JSON.stringify({ color_mode: "dark", authorlabel: "API value" }),
+    ),
+  ]);
+
+  expect(report.fields).toEqual(
+    expect.arrayContaining([
+      {
+        file: "notes.txt",
+        field: "line:1",
+        before: "it's don't",
+        after: "It's Don't",
+      },
+      {
+        file: "settings.yml",
+        field: "label:2",
+        before: "release notes",
+        after: "Release Notes",
+      },
+    ]),
+  );
+  expect(report.syntax).toEqual([]);
+  expect(
+    extractFields(
+      "docs.md",
+      "# Before\n```ts\n# not a heading\n```\n## After\n",
+    ),
+  ).toEqual([
+    {
+      file: "docs.md",
+      field: "heading:1",
+      value: "Before",
+      prose: true,
+    },
+    {
+      file: "docs.md",
+      field: "heading:5",
+      value: "After",
+      prose: true,
+    },
+  ]);
+  expect(
+    extractFields(
+      "config.json",
+      JSON.stringify({ color_mode: "dark", authorlabel: "API value" }),
+    ),
+  ).toEqual([
+    {
+      file: "config.json",
+      field: "color_mode",
+      value: "dark",
+      prose: false,
+    },
+    {
+      file: "config.json",
+      field: "authorlabel",
+      value: "API value",
+      prose: false,
+    },
+  ]);
 });
 
 test("checks json, markdown, and yaml syntax", () => {

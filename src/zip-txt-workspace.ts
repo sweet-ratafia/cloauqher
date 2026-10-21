@@ -132,7 +132,8 @@ export function findZipFiles(root: string): string[] {
         walk(path);
         continue;
       }
-      if (info.isFile() && entry.toLowerCase().endsWith(".zip")) found.push(path);
+      if (info.isFile() && entry.toLowerCase().endsWith(".zip"))
+        found.push(path);
     }
   };
   walk(root);
@@ -200,11 +201,7 @@ function renderSummary(result: ZipTxtWorkspaceResult): string {
       ? table(
           ["Archive", "Entry", "Warning"],
           result.files.flatMap((file) =>
-            file.warnings.map((warning) => [
-              file.archive,
-              file.entry,
-              warning,
-            ]),
+            file.warnings.map((warning) => [file.archive, file.entry, warning]),
           ),
         )
       : "No line warnings.",

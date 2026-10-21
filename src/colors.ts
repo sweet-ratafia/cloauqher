@@ -3,7 +3,14 @@ import { normalizeColor } from "./unicode-title-normalizer.js";
 const INLINE_COLOR =
   /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})\b|rgba?\([^)]*\)|hsla?\([^)]*\)/gi;
 
-const COLOR_KEY = /(color|colour|background|foreground|fill|stroke)/i;
+const COLOR_KEYS = new Set([
+  "color",
+  "colour",
+  "background",
+  "foreground",
+  "fill",
+  "stroke",
+]);
 
 export function isColorToken(token: string): boolean {
   if (token.startsWith("#")) {
@@ -56,5 +63,11 @@ export function findColors(
 }
 
 export function isColorField(field: string): boolean {
-  return COLOR_KEY.test(field);
+  const key = field
+    .replace(/:\d+$/, "")
+    .split(/[.[]/)
+    .at(-1)
+    ?.replace(/\]$/, "")
+    .toLowerCase();
+  return key !== undefined && COLOR_KEYS.has(key);
 }

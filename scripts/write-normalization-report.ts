@@ -1,8 +1,8 @@
 import {
+  lstatSync,
   mkdirSync,
   readdirSync,
   readFileSync,
-  statSync,
   writeFileSync,
 } from "node:fs";
 import { join, relative } from "node:path";
@@ -23,7 +23,8 @@ function walk(dir: string, root: string, out: SourceFile[]) {
     const path = join(dir, entry);
     const sourcePath = relative(root, path);
     if (shouldSkip(sourcePath)) continue;
-    const info = statSync(path);
+    const info = lstatSync(path);
+    if (info.isSymbolicLink()) continue;
     if (info.isDirectory()) {
       walk(path, root, out);
       continue;
@@ -42,6 +43,7 @@ walk(root, root, sources);
 const zipTxt = formatZipTxtWorkspace({
   workspaceDir: join(root, "workspace"),
   archives: loadZipArchives(root),
+  write: false,
 });
 for (const file of zipTxt.files) {
   sources.push({
