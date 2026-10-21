@@ -26,7 +26,13 @@ const TEXT_BASENAMES = new Set([
   ".prettierignore",
 ]);
 
-const SKIP_DIRS = new Set([".git", "node_modules", ".bun-cache", "reports"]);
+const SKIP_DIRS = new Set([
+  ".git",
+  "node_modules",
+  ".bun-cache",
+  "reports",
+  "workspace",
+]);
 const SKIP_FILES = new Set([
   "package-lock.json",
   "bun.lock",

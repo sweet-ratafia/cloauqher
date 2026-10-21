@@ -1,32 +1,77 @@
-# Reviewer install-safety harness
+# Unicode field normalization
 
-This repository lets Claude install the root development dependencies with the
-ordinary `bun install` command. Bun blocks dependency lifecycle scripts unless
-a package is explicitly listed in `trustedDependencies`; the reviewer safety
-check enforces a small allow-list for that exception.
+This project scans text files and proposes Unicode, title, and color
+normalization. It does not rewrite those source files. `.txt` members inside
+`.zip` archives are the exception: `bun run format:zip-txt` writes formatted
+copies under `workspace/`.
 
-Run `bun install`, `bun run security:check`, `bun run format:check`,
-`bun run typecheck`, and `bun test`.
+## Commands
 
-## Security check
+```bash
+bun install
+bun test
+bun run typecheck
+bun run format:check
+bun run normalize:report
+bun run format:zip-txt
+```
 
-`bun run security:check` runs `scripts/check-reviewer-safety.ts`. It reads the
-root `package.json` and rejects malformed, undeclared, or unapproved entries in
-`trustedDependencies`. The check is offline and deterministic; dependency
-freshness is handled separately from install-script trust.
+`bun run format:zip-txt` is the command that uses `analyse-zip-then-rezip-txt`.
+It finds `.zip` files, reads their `.txt` entries through that package, and
+writes normalized copies to `workspace/`. An optional path selects the scan
+root:
 
-## Staged package install test
+```bash
+bun run format:zip-txt -- /path/to/source
+```
 
-`ath-gziphugefile@0.0.0-stage` is intentionally present as an exact-pinned,
-trusted development dependency. The published staging artifact is currently a
-metadata-only placeholder with no exports or lifecycle scripts. The test suite
-resolves its installed manifest, verifies the exact version and staging marker,
-and verifies that this artifact declares no scripts. The safety check prevents
-the trusted entry from being changed to another version without review.
+`bun run normalize:report` does that same write, then renders
+`reports/normalization-report.md`. Zip text is included there as `zip-txt/...`.
+`bun test` also imports the package from `tests/normalization.test.ts`.
 
-The previous `GzipHugeFile` example was removed because this staging artifact
-does not export that API. A functional zip integration should be added when an
-operational release containing that export is published.
+## Normalization
 
-Every dependency is declared in that root manifest. There is no nested
-`package.json`.
+Text-like files are detected by extension and content. `node_modules`, `.git`,
+`reports`, and `workspace/` are skipped, so formatted output is not scanned
+again.
+
+String fields are Unicode-normalized (NFKC). Format characters are removed.
+Headings, `.txt` lines, and fields named title, description, summary, heading,
+or label are title-cased. Color fields and inline `#hex`, `rgb()`, and `hsl()`
+values become `#rrggbb`. A short all-digit token such as `#123` is left alone.
+JSON, Markdown fences, and YAML/TOML indentation and quotes get a lightweight
+syntax check.
+
+## Zip text
+
+`analyse-zip-then-rezip-txt` is the module that will be published on npm. Until
+then it is linked with `file:../analyse-zip-then-rezip-txt`. Code imports it by
+that package name.
+
+`fixtures/sample-notes.zip` is the checked-in sample. The formatter writes:
+
+- `workspace/fixtures__sample-notes/notes/menu.txt`
+- `workspace/fixtures__sample-notes/notes/plain.txt`
+- `workspace/zip-txt.md`
+
+`café menu #FFF` becomes `Café Menu #ffffff`. `../secret.txt` is reported in
+`workspace/zip-txt.md` and is not written. Non-`.txt` members, such as
+`notes/readme.md`, are ignored. The next run replaces that archive's directory,
+so entries removed from the zip do not linger.
+
+## Layout
+
+| Path | Role |
+| --- | --- |
+| `src/merged-report.ts` | Runs detection, normalization, colors, and syntax, then renders the report |
+| `src/fields.ts` | Extracts fields and normalizes them |
+| `src/colors.ts` | Canonicalizes color tokens |
+| `src/text-files.ts` | Decides which files are text and which paths are skipped |
+| `src/syntax-check.ts` | Checks JSON, Markdown, YAML, and TOML |
+| `src/zip-txt-workspace.ts` | Finds zips and writes `workspace/` |
+| `src/unicode-title-normalizer.js` | Unicode, title case, and color implementation |
+| `scripts/format-zip-txt.ts` | CLI for `bun run format:zip-txt` |
+| `scripts/write-normalization-report.ts` | CLI for `bun run normalize:report` |
+| `fixtures/sample-notes.zip` | Sample archive, including an unsafe path |
+| `workspace/` | Generated `.txt` copies and `zip-txt.md` |
+| `reports/normalization-report.md` | Generated combined report |
