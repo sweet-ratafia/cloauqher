@@ -152,6 +152,7 @@ const NAMED_COLORS = {
 };
 
 const ANSI_PATTERN =
+  // eslint-disable-next-line no-control-regex -- matches ANSI ESC and BEL sequences
   /\u001B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~]|\][^\u0007]*(?:\u0007|\u001B\\))/g;
 
 const HTML_TAG_PATTERN = /<\/?[a-z][^>]*>/gi;

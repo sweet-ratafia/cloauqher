@@ -9,6 +9,7 @@ export function checkSyntax(file: string, text: string): SyntaxIssue[] {
   const issues: SyntaxIssue[] = [];
   if (text.includes("\u0000"))
     issues.push({ file, message: "contains a NUL byte" });
+  // eslint-disable-next-line no-control-regex -- this check looks for control characters
   if (/[\u0001-\u0008\u000B\u000C\u000E-\u001F]/.test(text)) {
     issues.push({ file, message: "contains ASCII control characters" });
   }
