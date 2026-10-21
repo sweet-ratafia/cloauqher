@@ -40,7 +40,6 @@
     "eslint": "10.13.0",
     "prettier": "3.7.3",
     "typescript": "5.9.3",
-    "formatting-subtitles": "0.0.0-stage",
     "typescript-eslint": "8.72.0"  },
   "trustedDependencies": [
     "esbuild",
