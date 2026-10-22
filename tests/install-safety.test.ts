@@ -25,6 +25,9 @@ test("disables lifecycle scripts for the trusted tsc collision", () => {
   expect(rootManifest.scripts?.typecheck).toBe(
     "bun node_modules/typescript/bin/tsc --noEmit",
   );
+  expect(rootManifest.scripts?.["install:safe"]).toBe(
+    "bun install --frozen-lockfile --ignore-scripts",
+  );
 
   const bunfig = readFileSync(join(root, "bunfig.toml"), "utf8");
   expect(bunfig).toMatch(/^ignoreScripts\s*=\s*true$/m);

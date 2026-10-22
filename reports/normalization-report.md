@@ -5,7 +5,7 @@ Source files are not rewritten. Rows are proposals.
 
 ## Summary
 
-- Text-like files: 28
+- Text-like files: 27
 - Fields that would change: 4
 - Colors that would change: 4
 - Syntax issues: 0
@@ -38,7 +38,6 @@ Source files are not rewritten. Rows are proposals.
 | src/zip-txt-workspace.ts                               | code     |
 | tests/install-safety.test.ts                           | code     |
 | tests/normalization.test.ts                            | code     |
-| tests/toolbox-format.test.ts                           | code     |
 | tsconfig.json                                          | json     |
 | zip-txt/fixtures\_\_sample-notes/notes/menu.txt        | text     |
 | zip-txt/fixtures\_\_sample-notes/notes/plain.txt       | text     |

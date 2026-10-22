@@ -11,6 +11,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "typecheck": "bun node_modules/typescript/bin/tsc --noEmit",
+    "install:safe": "bun install --frozen-lockfile --ignore-scripts",
     "test": "bun test tests/ packages/analyse-zip-then-rezip-txt/test/",
     "complete-test-formatting": "bun run scripts/complete-test-formatting.ts",
     "normalize:report": "bun run scripts/write-normalization-report.ts",

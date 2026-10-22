@@ -8,7 +8,7 @@ copies under `workspace/`.
 ## Commands
 
 ```bash
-bun install --frozen-lockfile
+bun install --frozen-lockfile --ignore-scripts
 bun test
 bun run typecheck
 bun run lint
@@ -25,11 +25,14 @@ The manifest intentionally pins `nativescript-toolbox@3.0.1` and
 publishes a binary named `tsc`. Running lifecycle scripts would therefore make
 the selected executable depend on binary-link resolution.
 
-This repository does not need dependency lifecycle scripts. Both
-`bunfig.toml` and `.npmrc` disable them, including scripts from entries in
-`trustedDependencies`. The Bun configuration also freezes the lockfile, while
-the install command states frozen mode explicitly for review logs. Keep these
+This repository does not need dependency lifecycle scripts. The install
+command therefore states `--ignore-scripts` explicitly rather than relying on
+ambient configuration. `bunfig.toml` and `.npmrc` repeat that policy for
+ordinary installs, and the Bun configuration freezes the lockfile. Keep these
 controls and `tests/install-safety.test.ts` together.
+
+The dependencies above are inspected only as an install-safety regression
+case. Application code and tests do not import or execute them.
 
 The `typecheck` script also bypasses `node_modules/.bin/tsc` and invokes the
 pinned TypeScript compiler file directly. Do not shorten it to `tsc --noEmit`:
